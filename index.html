@@ -304,7 +304,7 @@ const BUCKET = 'media';
       html += `<button class="tab ${p.id===activeId?'active':''}" data-id="${p.id}">
         ${escapeHtml(p.name)}
         <span class="count">${photos} Fotos · ${videos} Videos</span>
-        <span class="del-person" data-del="${p.id}" title="Person löschen">✕</span>
+        <span class="del-person" data-del="${p.id}" title="Gruppe löschen">✕</span>
       </button>`;
     });
     if(addingPerson){
@@ -313,7 +313,7 @@ const BUCKET = 'media';
         <button id="confirmNewPerson">OK</button>
       </div>`;
     } else {
-      html += `<button class="tab tab-new" id="addPersonBtn">+ Neue Person</button>`;
+      html += `<button class="tab tab-new" id="addPersonBtn">Neue Gruppe</button>`;
     }
     tabs.innerHTML = html;
 
@@ -359,12 +359,12 @@ const BUCKET = 'media';
   function renderContent(){
     const content = document.getElementById('content');
     if(!activeId){
-      content.innerHTML = `<div class="empty-state">Noch niemand hier. Füge oben eine Person hinzu, um ihre Seite zu starten.</div>`;
+      content.innerHTML = `<div class="empty-state">Füge oben eine Gruppe hinzu.</div>`;
       return;
     }
     const person = getPerson(activeId);
     if(!person){
-      content.innerHTML = `<div class="empty-state">Person nicht gefunden.</div>`;
+      content.innerHTML = `<div class="empty-state">Gruppe nicht gefunden.</div>`;
       return;
     }
     const photos = person.items.filter(i=>i.type==='photo').length;
@@ -397,7 +397,7 @@ const BUCKET = 'media';
           <div class="person-meta">${photos} Fotos · ${videos} Videos</div>
         </div>
         <div>
-          <button class="btn btn-primary" id="addMediaBtn">+ Fotos / Videos hinzufügen</button>
+          <button class="btn btn-primary" id="addMediaBtn">Fotos / Videos hinzufügen</button>
           <input type="file" id="fileInput" accept="image/*,video/*" multiple>
         </div>
       </div>
