@@ -236,7 +236,8 @@ const BUCKET = 'media';
     name = name.trim();
     if(!name) return;
     const {data, error} = await sb.from('people').insert({name}).select().single();
-    if(error){ showToast('Person konnte nicht gespeichert werden.'); return; }
+    if(error){ showToast('Fehler: ' + error.message); return; }
+
     people.push({id:data.id, name:data.name, items:[]});
     activeId = data.id;
     addingPerson = false;
