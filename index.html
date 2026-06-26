@@ -238,6 +238,7 @@ const BUCKET = 'media';
     const {data, error} = await sb.from('people').insert({name}).select().single();
     if(error){ showToast('Fehler: ' + error.message); return; }
 
+
     people.push({id:data.id, name:data.name, items:[]});
     activeId = data.id;
     addingPerson = false;
