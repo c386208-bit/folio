@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --ink:#221b26;
+    --paper:#f4ece0;
+    --paper-2:#eee3d2;
+    --ochre:#c99a3e;
+    --ochre-dark:#a87c2c;
+    --brick:#9b4a3f;
+    --text-dark:#2a2420;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--ink);
+    color:var(--text-dark);
+    min-height:100vh;
+  }
+  .app{display:flex;flex-direction:column;min-height:100vh;}
+  header.top{
+    padding:18px 20px 10px;
+    background:var(--ink);
+    border-bottom:1px solid rgba(244,236,224,0.08);
+  }
+  .brand{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:26px;
+    color:var(--paper);
+    letter-spacing:0.5px;
+  }
+  .hint-storage{
+    font-size:12px;color:rgba(244,236,224,0.55);margin-top:4px;
+  }
+  main.layout{flex:1;display:flex;flex-direction:column;}
+  @media(min-width:860px){ main.layout{flex-direction:row;} }
+  nav.tabs{
+    display:flex;gap:10px;padding:16px 16px 4px;overflow-x:auto;background:var(--ink);
+  }
+  @media(min-width:860px){
+    nav.tabs{flex-direction:column;width:230px;padding:20px 14px;overflow-y:auto;overflow-x:hidden;gap:12px;}
+  }
+  .tab{
+    position:relative;flex:0 0 auto;min-width:120px;
+    padding:12px 26px 10px 16px;background:var(--paper-2);color:var(--text-dark);
+    border:none;border-radius:10px 10px 4px 4px;
+    font-family:'Fraunces',serif;font-weight:500;font-size:15px;cursor:pointer;text-align:left;
+    clip-path:polygon(0 0,100% 0,100% 100%,12px 100%,0 calc(100% - 12px));
+    transform:rotate(-1deg);transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 2px 4px rgba(0,0,0,0.25);
+  }
+  .tab:nth-child(even){transform:rotate(1deg);}
+  .tab:hover{transform:rotate(0deg) translateY(-2px);}
+  .tab.active{background:var(--paper);box-shadow:0 4px 10px rgba(0,0,0,0.35);transform:rotate(0deg) translateY(-2px);}
+  .tab .count{display:block;font-family:'Inter';font-weight:500;font-size:11px;color:rgba(42,36,32,0.55);margin-top:3px;}
+  .tab-new{background:transparent;border:1.5px dashed rgba(244,236,224,0.35);color:rgba(244,236,224,0.7);clip-path:none;transform:none;box-shadow:none;padding:12px 16px;}
+  .tab-new:hover{border-color:var(--ochre);color:var(--ochre);transform:none;}
+  .tab-new-input{display:flex;gap:6px;align-items:center;}
+  .tab-new-input input{width:110px;border:none;border-radius:6px;padding:8px;font-family:'Inter';font-size:13px;}
+  .tab-new-input button{border:none;background:var(--ochre);color:var(--ink);border-radius:6px;padding:8px 10px;font-weight:600;font-size:13px;cursor:pointer;}
+  .tab .del-person{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.15);color:var(--text-dark);font-size:11px;line-height:18px;text-align:center;cursor:pointer;}
+
+  section.content{flex:1;background:var(--paper);padding:24px 20px 60px;border-radius:18px 18px 0 0;}
+  @media(min-width:860px){ section.content{border-radius:18px 0 0 0;} }
+  .person-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:18px;border-bottom:2px solid rgba(42,36,32,0.1);padding-bottom:14px;}
+  .person-name{font-family:'Fraunces',serif;font-weight:600;font-size:30px;}
+  .person-meta{font-size:13px;color:rgba(42,36,32,0.6);margin-top:4px;}
+  .btn{border:none;border-radius:10px;padding:10px 16px;font-family:'Inter';font-weight:600;font-size:14px;cursor:pointer;}
+  .btn-primary{background:var(--ochre);color:var(--ink);}
+  .btn-primary:hover{background:var(--ochre-dark);}
+  .btn-primary:disabled{opacity:0.6;cursor:default;}
+
+  .empty-state{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:rgba(42,36,32,0.55);padding:40px 0;text-align:center;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1/1;background:#000;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.15);}
+  .item img, .item video{width:100%;height:100%;object-fit:cover;display:block;}
+  .item .play-badge{position:absolute;bottom:6px;left:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;}
+  .item .del-item{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;font-size:12px;line-height:22px;text-align:center;cursor:pointer;}
+  .item.uploading{opacity:0.5;}
+  .item .spinner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;background:rgba(0,0,0,0.35);}
+
+  .lightbox{position:fixed;inset:0;background:rgba(20,16,18,0.92);display:none;align-items:center;justify-content:center;z-index:50;padding:30px 20px;}
+  .lightbox.open{display:flex;}
+  .lightbox-inner{max-width:92vw;max-height:80vh;position:relative;}
+  .lightbox-inner img, .lightbox-inner video{max-width:92vw;max-height:78vh;border-radius:8px;display:block;}
+  .lightbox-close, .lightbox-del{position:absolute;width:32px;height:32px;border-radius:50%;border:none;font-size:15px;cursor:pointer;}
+  .lightbox-close{top:-16px;right:-16px;background:var(--paper);color:var(--ink);}
+  .lightbox-del{top:22px;right:-16px;background:var(--brick);color:#fff;}
+
+  .storage-note{font-size:12px;color:rgba(42,36,32,0.5);margin-top:14px;}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:none;z-index:60;max-width:88vw;text-align:center;}
+  .toast.show{display:block;}
+
+  .setup-screen{padding:40px 24px;max-width:520px;margin:0 auto;color:var(--paper);}
+  .setup-screen h2{font-family:'Fraunces',serif;}
+  .setup-screen code{background:rgba(244,236,224,0.1);padding:2px 6px;border-radius:4px;}
+
+  input[type=file]{display:none;}
+  ::selection{background:var(--ochre);color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">Folio</div>
+    <div class="hint-storage" id="storageHint">Fotos und Videos werden dauerhaft gespeichert</div>
+  </header>
+  <main class="layout">
+    <nav class="tabs" id="tabs"></nav>
+    <section class="content" id="content"></section>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner" id="lightboxInner"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =======================================================
+   HIER DEINE SUPABASE-DATEN EINTRAGEN
+   (Project Settings -> API in deinem Supabase-Projekt)
+   ======================================================= */
+const SUPABASE_URL = 'https://abcdefghijk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_t4A2pVNvjYItpC38Co6zDw_dYLYX3k9';
+const BUCKET = 'media';
+/* ======================================================= */
+
+(function(){
+  if(SUPABASE_URL.includes('DEINE_SUPABASE_URL') || SUPABASE_ANON_KEY.includes('DEIN_ANON_KEY')){
+    document.querySelector('.app').innerHTML = `
+      <div class="setup-screen">
+        <h2>Fast fertig!</h2>
+        <p>Trage oben im Code bei <code>SUPABASE_URL</code> und <code>SUPABASE_ANON_KEY</code> deine eigenen Werte aus deinem Supabase-Projekt ein (Project Settings → API), dann lädt die Seite normal.</p>
+      </div>`;
+    return;
+  }
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let people = [];
+  let activeId = null;
+  let addingPerson = false;
+
+  function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>t.classList.remove('show'), 3500);
+  }
+
+  function getPerson(id){return people.find(p=>p.id===id);}
+
+  async function loadState(){
+    const {data: peopleRows, error: pErr} = await sb.from('people').select('*').order('created_at');
+    if(pErr){ showToast('Konnte Personen nicht laden.'); return; }
+    const {data: itemRows, error: iErr} = await sb.from('items').select('*').order('created_at',{ascending:false});
+    if(iErr){ showToast('Konnte Medien nicht laden.'); }
+    people = (peopleRows||[]).map(p=>({
+      id:p.id, name:p.name,
+      items:(itemRows||[]).filter(it=>it.person_id===p.id).map(it=>({id:it.id,type:it.type,src:it.url,storagePath:it.storage_path}))
+    }));
+    if(people.length) activeId = people[0].id;
+  }
+
+  function compressImageToBlob(file){
+    return new Promise((resolve,reject)=>{
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = e => { img.src = e.target.result; };
+      reader.onerror = reject;
+      img.onload = () => {
+        const maxDim = 1600;
+        let {width,height} = img;
+        if(width>height && width>maxDim){height=height*maxDim/width;width=maxDim;}
+        else if(height>maxDim){width=width*maxDim/height;height=maxDim;}
+        const canvas = document.createElement('canvas');
+        canvas.width=width;canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        canvas.toBlob(blob=>resolve(blob), 'image/jpeg', 0.82);
+      };
+      img.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function addFiles(personId, fileList){
+    const person = getPerson(personId);
+    if(!person) return;
+    const files = Array.from(fileList).filter(f=>f.type.startsWith('image/')||f.type.startsWith('video/'));
+    if(!files.length) return;
+    showToast('Lade hoch…');
+    for(const file of files){
+      try{
+        const isPhoto = file.type.startsWith('image/');
+        const type = isPhoto ? 'photo' : 'video';
+        const blob = isPhoto ? await compressImageToBlob(file) : file;
+        const ext = isPhoto ? 'jpg' : (file.name.split('.').pop() || 'mp4');
+        const path = `${personId}/${genId()}.${ext}`;
+        const {error: upErr} = await sb.storage.from(BUCKET).upload(path, blob, {
+          contentType: isPhoto ? 'image/jpeg' : (file.type || 'video/mp4')
+        });
+        if(upErr){ showToast('Upload fehlgeschlagen: ' + upErr.message); continue; }
+        const { data: pub } = sb.storage.from(BUCKET).getPublicUrl(path);
+        const {data: row, error: insErr} = await sb.from('items').insert({
+          person_id: personId, type, storage_path: path, url: pub.publicUrl
+        }).select().single();
+        if(insErr){ showToast('Konnte nicht gespeichert werden.'); continue; }
+        person.items.unshift({id:row.id, type, src:pub.publicUrl, storagePath:path});
+      }catch(e){
+        showToast('Etwas ist schiefgelaufen.');
+      }
+    }
+    render();
+  }
+
+  async function addPerson(name){
+    name = name.trim();
+    if(!name) return;
+    const {data, error} = await sb.from('people').insert({name}).select().single();
+    if(error){ showToast('Person konnte nicht gespeichert werden.'); return; }
+    people.push({id:data.id, name:data.name, items:[]});
+    activeId = data.id;
+    addingPerson = false;
+    render();
+  }
+
+  async function deletePerson(id){
+    const person = getPerson(id);
+    if(person && person.items.length){
+      await sb.storage.from(BUCKET).remove(person.items.map(it=>it.storagePath));
+    }
+    await sb.from('people').delete().eq('id', id);
+    people = people.filter(p=>p.id!==id);
+    if(activeId===id) activeId = people.length ? people[0].id : null;
+    render();
+  }
+
+  async function deleteItem(personId,itemId){
+    const person = getPerson(personId);
+    if(!person) return;
+    const it = person.items.find(i=>i.id===itemId);
+    if(!it) return;
+    await sb.storage.from(BUCKET).remove([it.storagePath]);
+    await sb.from('items').delete().eq('id', itemId);
+    person.items = person.items.filter(i=>i.id!==itemId);
+    render();
+  }
+
+  function openLightbox(personId,itemId){
+    const person=getPerson(personId);
+    const it = person.items.find(i=>i.id===itemId);
+    if(!it) return;
+    const inner = document.getElementById('lightboxInner');
+    const media = it.type==='photo'
+      ? `<img src="${it.src}" alt="">`
+      : `<video src="${it.src}" controls autoplay></video>`;
+    inner.innerHTML = media + `
+      <button class="lightbox-close" title="Schließen">✕</button>
+      <button class="lightbox-del" title="Löschen">🗑</button>`;
+    inner.querySelector('.lightbox-close').onclick = closeLightbox;
+    inner.querySelector('.lightbox-del').onclick = ()=>{ deleteItem(personId,itemId); closeLightbox(); };
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox(){
+    document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('lightboxInner').innerHTML='';
+  }
+  document.getElementById('lightbox').addEventListener('click', e=>{
+    if(e.target.id==='lightbox') closeLightbox();
+  });
+
+  function render(){
+    renderTabs();
+    renderContent();
+  }
+
+  function renderTabs(){
+    const tabs = document.getElementById('tabs');
+    let html = '';
+    people.forEach(p=>{
+      const photos = p.items.filter(i=>i.type==='photo').length;
+      const videos = p.items.filter(i=>i.type==='video').length;
+      html += `<button class="tab ${p.id===activeId?'active':''}" data-id="${p.id}">
+        ${escapeHtml(p.name)}
+        <span class="count">${photos} Fotos · ${videos} Videos</span>
+        <span class="del-person" data-del="${p.id}" title="Person löschen">✕</span>
+      </button>`;
+    });
+    if(addingPerson){
+      html += `<div class="tab-new-input">
+        <input id="newPersonInput" placeholder="Name…">
+        <button id="confirmNewPerson">OK</button>
+      </div>`;
+    } else {
+      html += `<button class="tab tab-new" id="addPersonBtn">+ Neue Person</button>`;
+    }
+    tabs.innerHTML = html;
+
+    tabs.querySelectorAll('.tab[data-id]').forEach(el=>{
+      el.addEventListener('click', e=>{
+        if(e.target.dataset.del) return;
+        activeId = el.dataset.id;
+        render();
+      });
+    });
+    tabs.querySelectorAll('[data-del]').forEach(el=>{
+      el.addEventListener('click', e=>{
+        e.stopPropagation();
+        if(el.dataset.confirm === '1'){
+          deletePerson(el.dataset.del);
+        } else {
+          el.dataset.confirm = '1';
+          el.textContent = '✓';
+          el.title = 'Nochmal tippen zum Löschen';
+          setTimeout(()=>{ if(el.isConnected){ el.dataset.confirm=''; el.textContent='✕'; } }, 3000);
+        }
+      });
+    });
+    const addBtn = document.getElementById('addPersonBtn');
+    if(addBtn){
+      addBtn.addEventListener('click', ()=>{ addingPerson=true; render();
+        setTimeout(()=>document.getElementById('newPersonInput')?.focus(),0);
+      });
+    }
+    const confirmBtn = document.getElementById('confirmNewPerson');
+    const newInput = document.getElementById('newPersonInput');
+    if(confirmBtn){
+      const submit = ()=> addPerson(newInput.value);
+      confirmBtn.addEventListener('click', submit);
+      newInput.addEventListener('keydown', e=>{
+        if(e.key==='Enter') submit();
+        if(e.key==='Escape'){ addingPerson=false; render(); }
+      });
+      newInput.focus();
+    }
+  }
+
+  function renderContent(){
+    const content = document.getElementById('content');
+    if(!activeId){
+      content.innerHTML = `<div class="empty-state">Noch niemand hier. Füge oben eine Person hinzu, um ihre Seite zu starten.</div>`;
+      return;
+    }
+    const person = getPerson(activeId);
+    if(!person){
+      content.innerHTML = `<div class="empty-state">Person nicht gefunden.</div>`;
+      return;
+    }
+    const photos = person.items.filter(i=>i.type==='photo').length;
+    const videos = person.items.filter(i=>i.type==='video').length;
+
+    let itemsHtml = '';
+    if(person.items.length===0){
+      itemsHtml = `<div class="empty-state">Noch keine Fotos oder Videos. Füge das erste hinzu.</div>`;
+    } else {
+      itemsHtml = '<div class="grid">' + person.items.map(it=>{
+        if(it.type==='photo'){
+          return `<div class="item" data-id="${it.id}">
+            <img src="${it.src}" alt="">
+            <span class="del-item" data-del="${it.id}">✕</span>
+          </div>`;
+        } else {
+          return `<div class="item" data-id="${it.id}">
+            <video src="${it.src}" muted preload="metadata"></video>
+            <span class="play-badge">▶</span>
+            <span class="del-item" data-del="${it.id}">✕</span>
+          </div>`;
+        }
+      }).join('') + '</div>';
+    }
+
+    content.innerHTML = `
+      <div class="person-header">
+        <div>
+          <div class="person-name">${escapeHtml(person.name)}</div>
+          <div class="person-meta">${photos} Fotos · ${videos} Videos</div>
+        </div>
+        <div>
+          <button class="btn btn-primary" id="addMediaBtn">+ Fotos / Videos hinzufügen</button>
+          <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+        </div>
+      </div>
+      ${itemsHtml}
+      <div class="storage-note">Fotos und Videos werden dauerhaft gespeichert. Der Upload kann je nach Dateigröße einen Moment dauern.</div>
+    `;
+
+    document.getElementById('addMediaBtn').addEventListener('click', ()=>{
+      document.getElementById('fileInput').click();
+    });
+    document.getElementById('fileInput').addEventListener('change', e=>{
+      addFiles(person.id, e.target.files);
+      e.target.value = '';
+    });
+    content.querySelectorAll('.item').forEach(el=>{
+      el.addEventListener('click', e=>{
+        if(e.target.dataset.del) return;
+        openLightbox(person.id, el.dataset.id);
+      });
+    });
+    content.querySelectorAll('[data-del]').forEach(el=>{
+      el.addEventListener('click', e=>{
+        e.stopPropagation();
+        deleteItem(person.id, el.dataset.del);
+      });
+    });
+  }
+
+  loadState().then(render);
+})();
+</script>
+</body>
+</html>
