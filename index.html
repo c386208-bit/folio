@@ -322,7 +322,7 @@ const BUCKET = 'media';
 
   async function loadState(){
     const {data: peopleRows, error: pErr} = await sb.from('people').select('*').order('created_at');
-    if(pErr){ showToast('Konnte Personen nicht laden.'); return; }
+    if(pErr){ showToast('Konnte Gruppen nicht laden.'); return; }
     const {data: itemRows, error: iErr} = await sb.from('items').select('*').order('created_at',{ascending:false});
     if(iErr){ showToast('Konnte Medien nicht laden.'); }
     people = (peopleRows||[]).map(p=>({
@@ -449,7 +449,7 @@ const BUCKET = 'media';
           <button id="confirmNewPerson">OK</button>
         </div>`;
       } else {
-        html += `<button class="tab tab-new" id="addPersonBtn">+ Neue Person</button>`;
+        html += `<button class="tab tab-new" id="addPersonBtn">Neue Gruppe</button>`;
       }
     }
     tabs.innerHTML = html;
