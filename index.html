@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leaked files</title>
+<title>Folio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -31,6 +31,7 @@
     padding:18px 20px 10px;
     background:var(--ink);
     border-bottom:1px solid rgba(244,236,224,0.08);
+    display:flex;justify-content:space-between;align-items:flex-start;
   }
   .brand{
     font-family:'Fraunces',serif;
@@ -40,9 +41,11 @@
     color:var(--paper);
     letter-spacing:0.5px;
   }
-  .hint-storage{
-    font-size:12px;color:rgba(244,236,224,0.55);margin-top:4px;
+  .admin-btn{
+    background:rgba(244,236,224,0.1);border:none;color:var(--paper);
+    width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;
   }
+  .admin-btn.is-admin{background:var(--ochre);color:var(--ink);}
   main.layout{flex:1;display:flex;flex-direction:column;}
   @media(min-width:860px){ main.layout{flex-direction:row;} }
   nav.tabs{
@@ -79,7 +82,6 @@
   .btn{border:none;border-radius:10px;padding:10px 16px;font-family:'Inter';font-weight:600;font-size:14px;cursor:pointer;}
   .btn-primary{background:var(--ochre);color:var(--ink);}
   .btn-primary:hover{background:var(--ochre-dark);}
-  .btn-primary:disabled{opacity:0.6;cursor:default;}
 
   .empty-state{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:rgba(42,36,32,0.55);padding:40px 0;text-align:center;}
 
@@ -88,8 +90,6 @@
   .item img, .item video{width:100%;height:100%;object-fit:cover;display:block;}
   .item .play-badge{position:absolute;bottom:6px;left:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;}
   .item .del-item{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;font-size:12px;line-height:22px;text-align:center;cursor:pointer;}
-  .item.uploading{opacity:0.5;}
-  .item .spinner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;background:rgba(0,0,0,0.35);}
 
   .lightbox{position:fixed;inset:0;background:rgba(20,16,18,0.92);display:none;align-items:center;justify-content:center;z-index:50;padding:30px 20px;}
   .lightbox.open{display:flex;}
@@ -99,23 +99,57 @@
   .lightbox-close{top:-16px;right:-16px;background:var(--paper);color:var(--ink);}
   .lightbox-del{top:22px;right:-16px;background:var(--brick);color:#fff;}
 
-  .storage-note{font-size:12px;color:rgba(42,36,32,0.5);margin-top:14px;}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:none;z-index:60;max-width:88vw;text-align:center;}
   .toast.show{display:block;}
 
   .setup-screen{padding:40px 24px;max-width:520px;margin:0 auto;color:var(--paper);}
   .setup-screen h2{font-family:'Fraunces',serif;}
   .setup-screen code{background:rgba(244,236,224,0.1);padding:2px 6px;border-radius:4px;}
+  .setup-screen input{width:100%;padding:10px;border-radius:8px;border:none;margin-top:8px;font-family:'Inter';}
+  .setup-screen .field{margin-bottom:14px;}
+  .setup-screen label{font-size:13px;color:rgba(244,236,224,0.8);}
+  .setup-screen .err{color:#e8a3a3;font-size:13px;margin-top:8px;}
+
+  .overlay{position:fixed;inset:0;background:rgba(20,16,18,0.92);display:none;align-items:center;justify-content:center;z-index:80;padding:20px;}
+  .overlay.open{display:flex;}
+  .overlay-card{background:var(--ink);border-radius:14px;padding:28px;max-width:380px;width:100%;color:var(--paper);position:relative;}
+  .overlay-card h3{font-family:'Fraunces',serif;margin-top:0;}
+  .overlay-close{position:absolute;top:-14px;right:-14px;width:30px;height:30px;border-radius:50%;background:var(--paper);color:var(--ink);border:none;font-size:14px;cursor:pointer;}
+  .toggle-row{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:14px;}
+  .toggle-row input[type=checkbox]{width:20px;height:20px;}
+  .overlay-card input[type=text],.overlay-card input[type=password],.overlay-card input[type=email]{
+    width:100%;padding:10px;border-radius:8px;border:none;margin-top:6px;font-family:'Inter';
+  }
+  .overlay-card .field{margin-bottom:12px;}
+  .overlay-card label{font-size:13px;color:rgba(244,236,224,0.75);}
+  .overlay-card .err{color:#e8a3a3;font-size:13px;margin-top:8px;min-height:16px;}
+  .overlay-card .btn{width:100%;margin-top:6px;}
+  .overlay-card .btn-secondary{background:transparent;border:1.5px solid rgba(244,236,224,0.3);color:var(--paper);margin-top:8px;}
 
   input[type=file]{display:none;}
   ::selection{background:var(--ochre);color:var(--ink);}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="overlay" id="gateOverlay">
+  <div class="setup-screen">
+    <h2>Passwort erforderlich</h2>
+    <div class="field">
+      <input id="gatePw" type="password" placeholder="Passwort">
+    </div>
+    <button class="btn btn-primary" id="gateBtn" style="width:100%;">Weiter</button>
+    <div class="err" id="gateErr"></div>
+  </div>
+</div>
+
+<div class="overlay" id="adminOverlay">
+  <div class="overlay-card" id="adminCard"></div>
+</div>
+
+<div class="app" id="appRoot">
   <header class="top">
     <div class="brand">Folio</div>
-    <div class="hint-storage" id="storageHint"></div>
+    <button class="admin-btn" id="adminBtn" title="Admin">⚙</button>
   </header>
   <main class="layout">
     <nav class="tabs" id="tabs"></nav>
@@ -131,7 +165,6 @@
 <script>
 /* =======================================================
    HIER DEINE SUPABASE-DATEN EINTRAGEN
-   (Project Settings -> API in deinem Supabase-Projekt)
    ======================================================= */
 const SUPABASE_URL = 'https://jyhxevkclomncqqpplax.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_t4A2pVNvjYItpC38Co6zDw_dYLYX3k9';
@@ -140,10 +173,10 @@ const BUCKET = 'media';
 
 (function(){
   if(SUPABASE_URL.includes('DEINE_SUPABASE_URL') || SUPABASE_ANON_KEY.includes('DEIN_ANON_KEY')){
-    document.querySelector('.app').innerHTML = `
+    document.getElementById('appRoot').innerHTML = `
       <div class="setup-screen">
         <h2>Fast fertig!</h2>
-        <p>Trage oben im Code bei <code>SUPABASE_URL</code> und <code>SUPABASE_ANON_KEY</code> deine eigenen Werte aus deinem Supabase-Projekt ein (Project Settings → API), dann lädt die Seite normal.</p>
+        <p>Trage oben im Code bei <code>SUPABASE_URL</code> und <code>SUPABASE_ANON_KEY</code> deine eigenen Werte ein.</p>
       </div>`;
     return;
   }
@@ -152,13 +185,14 @@ const BUCKET = 'media';
   let people = [];
   let activeId = null;
   let addingPerson = false;
+  let session = null;
+  let settings = { site_password: null, allow_public_add: true, allow_public_delete: true };
+  let unlocked = sessionStorage.getItem('folio_unlocked') === '1';
 
   function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
-
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
-
   function showToast(msg){
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -166,21 +200,105 @@ const BUCKET = 'media';
     clearTimeout(t._timer);
     t._timer = setTimeout(()=>t.classList.remove('show'), 3500);
   }
-
   function getPerson(id){return people.find(p=>p.id===id);}
+  function isAdmin(){ return !!session; }
+  function canAdd(){ return isAdmin() || !!settings.allow_public_add; }
+  function canDelete(){ return isAdmin() || !!settings.allow_public_delete; }
 
-  async function loadState(){
-    const {data: peopleRows, error: pErr} = await sb.from('people').select('*').order('created_at');
-    if(pErr){ showToast('Konnte Personen nicht laden.'); return; }
-    const {data: itemRows, error: iErr} = await sb.from('items').select('*').order('created_at',{ascending:false});
-    if(iErr){ showToast('Konnte Medien nicht laden.'); }
-    people = (peopleRows||[]).map(p=>({
-      id:p.id, name:p.name,
-      items:(itemRows||[]).filter(it=>it.person_id===p.id).map(it=>({id:it.id,type:it.type,src:it.url,storagePath:it.storage_path}))
-    }));
-    if(people.length) activeId = people[0].id;
+  /* ---------- Settings & Auth ---------- */
+  async function loadSettings(){
+    const {data, error} = await sb.from('settings').select('*').eq('id',1).single();
+    if(!error && data) settings = data;
+  }
+  async function refreshSession(){
+    const {data} = await sb.auth.getSession();
+    session = data.session;
+  }
+  sb.auth.onAuthStateChange((_e, sess)=>{ session = sess; renderAdminCard(); renderAll(); });
+
+  function checkGate(){
+    const needsGate = settings.site_password && settings.site_password.length>0 && !unlocked && !isAdmin();
+    document.getElementById('gateOverlay').classList.toggle('open', !!needsGate);
+    return needsGate;
+  }
+  document.getElementById('gateBtn').addEventListener('click', ()=>{
+    const val = document.getElementById('gatePw').value;
+    if(val && val === settings.site_password){
+      unlocked = true;
+      sessionStorage.setItem('folio_unlocked','1');
+      document.getElementById('gateOverlay').classList.remove('open');
+      boot(true);
+    } else {
+      document.getElementById('gateErr').textContent = 'Falsches Passwort.';
+    }
+  });
+
+  /* ---------- Admin panel ---------- */
+  const adminOverlay = document.getElementById('adminOverlay');
+  document.getElementById('adminBtn').addEventListener('click', ()=>{
+    renderAdminCard();
+    adminOverlay.classList.add('open');
+  });
+  adminOverlay.addEventListener('click', e=>{ if(e.target===adminOverlay) adminOverlay.classList.remove('open'); });
+
+  function renderAdminCard(){
+    const btn = document.getElementById('adminBtn');
+    btn.classList.toggle('is-admin', isAdmin());
+    const card = document.getElementById('adminCard');
+    if(!isAdmin()){
+      card.innerHTML = `
+        <button class="overlay-close" id="closeAdmin">✕</button>
+        <h3>Admin-Login</h3>
+        <div class="field"><label>E-Mail</label><input type="email" id="loginEmail"></div>
+        <div class="field"><label>Passwort</label><input type="password" id="loginPw"></div>
+        <button class="btn btn-primary" id="loginBtn">Einloggen</button>
+        <div class="err" id="loginErr"></div>`;
+      document.getElementById('loginBtn').onclick = async ()=>{
+        const email = document.getElementById('loginEmail').value.trim();
+        const pw = document.getElementById('loginPw').value;
+        const {error} = await sb.auth.signInWithPassword({email, password: pw});
+        if(error){ document.getElementById('loginErr').textContent = 'Login fehlgeschlagen: ' + error.message; }
+        else { adminOverlay.classList.remove('open'); showToast('Als Admin eingeloggt.'); }
+      };
+    } else {
+      card.innerHTML = `
+        <button class="overlay-close" id="closeAdmin">✕</button>
+        <h3>Einstellungen</h3>
+        <div class="toggle-row">
+          <span>Jeder darf hinzufügen</span>
+          <input type="checkbox" id="toggleAdd" ${settings.allow_public_add?'checked':''}>
+        </div>
+        <div class="toggle-row">
+          <span>Jeder darf löschen</span>
+          <input type="checkbox" id="toggleDel" ${settings.allow_public_delete?'checked':''}>
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label>Allgemeines Seiten-Passwort (leer = aus)</label>
+          <input type="text" id="sitePw" value="${escapeHtml(settings.site_password||'')}">
+        </div>
+        <button class="btn btn-primary" id="saveSettingsBtn">Speichern</button>
+        <button class="btn btn-secondary" id="logoutBtn">Abmelden</button>
+        <div class="err" id="settingsMsg"></div>`;
+      document.getElementById('saveSettingsBtn').onclick = async ()=>{
+        const allow_public_add = document.getElementById('toggleAdd').checked;
+        const allow_public_delete = document.getElementById('toggleDel').checked;
+        const site_password = document.getElementById('sitePw').value.trim() || null;
+        const {error} = await sb.from('settings').update({allow_public_add, allow_public_delete, site_password}).eq('id',1);
+        if(error){ document.getElementById('settingsMsg').textContent = 'Fehler: ' + error.message; return; }
+        settings = {...settings, allow_public_add, allow_public_delete, site_password};
+        showToast('Einstellungen gespeichert.');
+        renderAll();
+      };
+      document.getElementById('logoutBtn').onclick = async ()=>{
+        await sb.auth.signOut();
+        adminOverlay.classList.remove('open');
+      };
+    }
+    const closeBtn = document.getElementById('closeAdmin');
+    if(closeBtn) closeBtn.onclick = ()=> adminOverlay.classList.remove('open');
   }
 
+  /* ---------- Data ---------- */
   function compressImageToBlob(file){
     return new Promise((resolve,reject)=>{
       const img = new Image();
@@ -202,7 +320,20 @@ const BUCKET = 'media';
     });
   }
 
+  async function loadState(){
+    const {data: peopleRows, error: pErr} = await sb.from('people').select('*').order('created_at');
+    if(pErr){ showToast('Konnte Personen nicht laden.'); return; }
+    const {data: itemRows, error: iErr} = await sb.from('items').select('*').order('created_at',{ascending:false});
+    if(iErr){ showToast('Konnte Medien nicht laden.'); }
+    people = (peopleRows||[]).map(p=>({
+      id:p.id, name:p.name,
+      items:(itemRows||[]).filter(it=>it.person_id===p.id).map(it=>({id:it.id,type:it.type,src:it.url,storagePath:it.storage_path}))
+    }));
+    if(people.length && !activeId) activeId = people[0].id;
+  }
+
   async function addFiles(personId, fileList){
+    if(!canAdd()){ showToast('Hinzufügen ist aktuell deaktiviert.'); return; }
     const person = getPerson(personId);
     if(!person) return;
     const files = Array.from(fileList).filter(f=>f.type.startsWith('image/')||f.type.startsWith('video/'));
@@ -223,48 +354,51 @@ const BUCKET = 'media';
         const {data: row, error: insErr} = await sb.from('items').insert({
           person_id: personId, type, storage_path: path, url: pub.publicUrl
         }).select().single();
-        if(insErr){ showToast('Konnte nicht gespeichert werden.'); continue; }
+        if(insErr){ showToast('Konnte nicht gespeichert werden: ' + insErr.message); continue; }
         person.items.unshift({id:row.id, type, src:pub.publicUrl, storagePath:path});
       }catch(e){
         showToast('Etwas ist schiefgelaufen.');
       }
     }
-    render();
+    renderAll();
   }
 
   async function addPerson(name){
+    if(!canAdd()){ showToast('Hinzufügen ist aktuell deaktiviert.'); return; }
     name = name.trim();
     if(!name) return;
     const {data, error} = await sb.from('people').insert({name}).select().single();
     if(error){ showToast('Fehler: ' + error.message); return; }
-
-
     people.push({id:data.id, name:data.name, items:[]});
     activeId = data.id;
     addingPerson = false;
-    render();
+    renderAll();
   }
 
   async function deletePerson(id){
+    if(!canDelete()){ showToast('Löschen ist aktuell deaktiviert.'); return; }
     const person = getPerson(id);
     if(person && person.items.length){
       await sb.storage.from(BUCKET).remove(person.items.map(it=>it.storagePath));
     }
-    await sb.from('people').delete().eq('id', id);
+    const {error} = await sb.from('people').delete().eq('id', id);
+    if(error){ showToast('Fehler: ' + error.message); return; }
     people = people.filter(p=>p.id!==id);
     if(activeId===id) activeId = people.length ? people[0].id : null;
-    render();
+    renderAll();
   }
 
   async function deleteItem(personId,itemId){
+    if(!canDelete()){ showToast('Löschen ist aktuell deaktiviert.'); return; }
     const person = getPerson(personId);
     if(!person) return;
     const it = person.items.find(i=>i.id===itemId);
     if(!it) return;
     await sb.storage.from(BUCKET).remove([it.storagePath]);
-    await sb.from('items').delete().eq('id', itemId);
+    const {error} = await sb.from('items').delete().eq('id', itemId);
+    if(error){ showToast('Fehler: ' + error.message); return; }
     person.items = person.items.filter(i=>i.id!==itemId);
-    render();
+    renderAll();
   }
 
   function openLightbox(personId,itemId){
@@ -275,11 +409,11 @@ const BUCKET = 'media';
     const media = it.type==='photo'
       ? `<img src="${it.src}" alt="">`
       : `<video src="${it.src}" controls autoplay></video>`;
-    inner.innerHTML = media + `
-      <button class="lightbox-close" title="Schließen">✕</button>
-      <button class="lightbox-del" title="Löschen">🗑</button>`;
+    const delBtn = canDelete() ? `<button class="lightbox-del" title="Löschen">🗑</button>` : '';
+    inner.innerHTML = media + `<button class="lightbox-close" title="Schließen">✕</button>${delBtn}`;
     inner.querySelector('.lightbox-close').onclick = closeLightbox;
-    inner.querySelector('.lightbox-del').onclick = ()=>{ deleteItem(personId,itemId); closeLightbox(); };
+    const d = inner.querySelector('.lightbox-del');
+    if(d) d.onclick = ()=>{ deleteItem(personId,itemId); closeLightbox(); };
     document.getElementById('lightbox').classList.add('open');
   }
   function closeLightbox(){
@@ -290,7 +424,7 @@ const BUCKET = 'media';
     if(e.target.id==='lightbox') closeLightbox();
   });
 
-  function render(){
+  function renderAll(){
     renderTabs();
     renderContent();
   }
@@ -301,19 +435,22 @@ const BUCKET = 'media';
     people.forEach(p=>{
       const photos = p.items.filter(i=>i.type==='photo').length;
       const videos = p.items.filter(i=>i.type==='video').length;
+      const delHtml = canDelete() ? `<span class="del-person" data-del="${p.id}" title="Person löschen">✕</span>` : '';
       html += `<button class="tab ${p.id===activeId?'active':''}" data-id="${p.id}">
         ${escapeHtml(p.name)}
         <span class="count">${photos} Fotos · ${videos} Videos</span>
-        <span class="del-person" data-del="${p.id}" title="Gruppe löschen">✕</span>
+        ${delHtml}
       </button>`;
     });
-    if(addingPerson){
-      html += `<div class="tab-new-input">
-        <input id="newPersonInput" placeholder="Name…">
-        <button id="confirmNewPerson">OK</button>
-      </div>`;
-    } else {
-      html += `<button class="tab tab-new" id="addPersonBtn">Neue Gruppe</button>`;
+    if(canAdd()){
+      if(addingPerson){
+        html += `<div class="tab-new-input">
+          <input id="newPersonInput" placeholder="Name…">
+          <button id="confirmNewPerson">OK</button>
+        </div>`;
+      } else {
+        html += `<button class="tab tab-new" id="addPersonBtn">+ Neue Person</button>`;
+      }
     }
     tabs.innerHTML = html;
 
@@ -321,7 +458,7 @@ const BUCKET = 'media';
       el.addEventListener('click', e=>{
         if(e.target.dataset.del) return;
         activeId = el.dataset.id;
-        render();
+        renderAll();
       });
     });
     tabs.querySelectorAll('[data-del]').forEach(el=>{
@@ -332,14 +469,13 @@ const BUCKET = 'media';
         } else {
           el.dataset.confirm = '1';
           el.textContent = '✓';
-          el.title = 'Nochmal tippen zum Löschen';
           setTimeout(()=>{ if(el.isConnected){ el.dataset.confirm=''; el.textContent='✕'; } }, 3000);
         }
       });
     });
     const addBtn = document.getElementById('addPersonBtn');
     if(addBtn){
-      addBtn.addEventListener('click', ()=>{ addingPerson=true; render();
+      addBtn.addEventListener('click', ()=>{ addingPerson=true; renderAll();
         setTimeout(()=>document.getElementById('newPersonInput')?.focus(),0);
       });
     }
@@ -350,7 +486,7 @@ const BUCKET = 'media';
       confirmBtn.addEventListener('click', submit);
       newInput.addEventListener('keydown', e=>{
         if(e.key==='Enter') submit();
-        if(e.key==='Escape'){ addingPerson=false; render(); }
+        if(e.key==='Escape'){ addingPerson=false; renderAll(); }
       });
       newInput.focus();
     }
@@ -359,12 +495,12 @@ const BUCKET = 'media';
   function renderContent(){
     const content = document.getElementById('content');
     if(!activeId){
-      content.innerHTML = `<div class="empty-state">Füge oben eine Gruppe hinzu.</div>`;
+      content.innerHTML = `<div class="empty-state">Noch niemand hier.${canAdd()?' Füge oben eine Person hinzu, um ihre Seite zu starten.':''}</div>`;
       return;
     }
     const person = getPerson(activeId);
     if(!person){
-      content.innerHTML = `<div class="empty-state">Gruppe nicht gefunden.</div>`;
+      content.innerHTML = `<div class="empty-state">Person nicht gefunden.</div>`;
       return;
     }
     const photos = person.items.filter(i=>i.type==='photo').length;
@@ -372,23 +508,28 @@ const BUCKET = 'media';
 
     let itemsHtml = '';
     if(person.items.length===0){
-      itemsHtml = `<div class="empty-state">Noch keine Fotos oder Videos. Füge das erste hinzu.</div>`;
+      itemsHtml = `<div class="empty-state">Noch keine Fotos oder Videos.${canAdd()?' Füge das erste hinzu.':''}</div>`;
     } else {
       itemsHtml = '<div class="grid">' + person.items.map(it=>{
+        const delHtml = canDelete() ? `<span class="del-item" data-del="${it.id}">✕</span>` : '';
         if(it.type==='photo'){
           return `<div class="item" data-id="${it.id}">
             <img src="${it.src}" alt="">
-            <span class="del-item" data-del="${it.id}">✕</span>
+            ${delHtml}
           </div>`;
         } else {
           return `<div class="item" data-id="${it.id}">
             <video src="${it.src}" muted preload="metadata"></video>
             <span class="play-badge">▶</span>
-            <span class="del-item" data-del="${it.id}">✕</span>
+            ${delHtml}
           </div>`;
         }
       }).join('') + '</div>';
     }
+
+    const addHtml = canAdd()
+      ? `<button class="btn btn-primary" id="addMediaBtn">+ Fotos / Videos hinzufügen</button><input type="file" id="fileInput" accept="image/*,video/*" multiple>`
+      : '';
 
     content.innerHTML = `
       <div class="person-header">
@@ -396,22 +537,19 @@ const BUCKET = 'media';
           <div class="person-name">${escapeHtml(person.name)}</div>
           <div class="person-meta">${photos} Fotos · ${videos} Videos</div>
         </div>
-        <div>
-          <button class="btn btn-primary" id="addMediaBtn">Fotos / Videos hinzufügen</button>
-          <input type="file" id="fileInput" accept="image/*,video/*" multiple>
-        </div>
+        <div>${addHtml}</div>
       </div>
       ${itemsHtml}
-      <div class="storage-note"></div>
     `;
 
-    document.getElementById('addMediaBtn').addEventListener('click', ()=>{
-      document.getElementById('fileInput').click();
-    });
-    document.getElementById('fileInput').addEventListener('change', e=>{
-      addFiles(person.id, e.target.files);
-      e.target.value = '';
-    });
+    const addBtn = document.getElementById('addMediaBtn');
+    if(addBtn){
+      addBtn.addEventListener('click', ()=>{ document.getElementById('fileInput').click(); });
+      document.getElementById('fileInput').addEventListener('change', e=>{
+        addFiles(person.id, e.target.files);
+        e.target.value = '';
+      });
+    }
     content.querySelectorAll('.item').forEach(el=>{
       el.addEventListener('click', e=>{
         if(e.target.dataset.del) return;
@@ -426,7 +564,15 @@ const BUCKET = 'media';
     });
   }
 
-  loadState().then(render);
+  async function boot(skipGateCheck){
+    await loadSettings();
+    await refreshSession();
+    if(!skipGateCheck && checkGate()) return;
+    await loadState();
+    renderAll();
+  }
+
+  boot();
 })();
 </script>
 </body>
