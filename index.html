@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Folio</title>
+<title>Test</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -148,7 +148,7 @@
 
 <div class="app" id="appRoot">
   <header class="top">
-    <div class="brand">Folio</div>
+    <div class="brand">Test</div>
     <button class="admin-btn" id="adminBtn" title="Admin">⚙</button>
   </header>
   <main class="layout">
@@ -435,7 +435,7 @@ const BUCKET = 'media';
     people.forEach(p=>{
       const photos = p.items.filter(i=>i.type==='photo').length;
       const videos = p.items.filter(i=>i.type==='video').length;
-      const delHtml = canDelete() ? `<span class="del-person" data-del="${p.id}" title="Person löschen">✕</span>` : '';
+      const delHtml = canDelete() ? `<span class="del-person" data-del="${p.id}" title="Gruppe löschen">✕</span>` : '';
       html += `<button class="tab ${p.id===activeId?'active':''}" data-id="${p.id}">
         ${escapeHtml(p.name)}
         <span class="count">${photos} Fotos · ${videos} Videos</span>
@@ -495,12 +495,12 @@ const BUCKET = 'media';
   function renderContent(){
     const content = document.getElementById('content');
     if(!activeId){
-      content.innerHTML = `<div class="empty-state">Noch niemand hier.${canAdd()?' Füge oben eine Person hinzu, um ihre Seite zu starten.':''}</div>`;
+      content.innerHTML = `<div class="empty-state">Noch nichts hier.${canAdd()?' Füge oben eine Gruppe hinzu.':''}</div>`;
       return;
     }
     const person = getPerson(activeId);
     if(!person){
-      content.innerHTML = `<div class="empty-state">Person nicht gefunden.</div>`;
+      content.innerHTML = `<div class="empty-state">Gruppe nicht gefunden.</div>`;
       return;
     }
     const photos = person.items.filter(i=>i.type==='photo').length;
@@ -528,7 +528,7 @@ const BUCKET = 'media';
     }
 
     const addHtml = canAdd()
-      ? `<button class="btn btn-primary" id="addMediaBtn">+ Fotos / Videos hinzufügen</button><input type="file" id="fileInput" accept="image/*,video/*" multiple>`
+      ? `<button class="btn btn-primary" id="addMediaBtn">Fotos / Videos hinzufügen</button><input type="file" id="fileInput" accept="image/*,video/*" multiple>`
       : '';
 
     content.innerHTML = `
